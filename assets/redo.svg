@@ -1,0 +1,20 @@
+<svg width="56" height="53" viewBox="0 0 56 53" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="redo">
+<g id="Rectangle 19" filter="url(#filter0_d_11_94)">
+<rect width="54" height="53" rx="26.5" fill="#1A365D"/>
+<rect x="1.5" y="1.5" width="51" height="50" rx="25" stroke="#1A365D" stroke-width="3"/>
+</g>
+<path id="Vector" d="M41 21.75V30.5H32.25M13 34C13.8698 26.125 18.8923 20 27 20C31.7775 20 37.3758 23.969 39.7645 29.625" stroke="#FFE8E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<filter id="filter0_d_11_94" x="0" y="0" width="56" height="53" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="2"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 0.911218 0 0 0 0 0.911218 0 0 0 1 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_11_94"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_11_94" result="shape"/>
+</filter>
+</defs>
+</svg>
