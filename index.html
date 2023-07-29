@@ -8,58 +8,90 @@
 
     <link rel="stylesheet" href="styles/normalize.css">
     <link rel="stylesheet" href="styles/style.css">
+
+    <script defer src="./js/script.js"></script>
 </head>
 
 <body>
     <header>
-        <h1>ETCH-A-SKETCH</h1>
+        <h1><span>E</span>TCH-A-<span>S</span>KETCH</h1>
     </header>
-    <main>
-        <div class="button-group-one">
+    <div class="main-content">
+        <main>
+            <a href="#" style="position: absolute; top: -1000px;">Hidden Focus Element</a>
 
-            <div class="button">
-                <label for="color">COLOR</label>
-                <input type="color" name="color" id="color">
+            <div class="button-group-one">
+
+                <input autocomplete="off" type="radio" name="mode" id="single-color" checked="checked">
+                <label for="single-color" class="button">
+                    <span for="color">COLOR</span>
+                    <div class="color-wrapper"><input autocomplete="on" type="color" name="color" value="#1A1A1A"
+                            id="color"></div>
+                </label>
+
+                <input autocomplete="off" type="radio" name="mode" id="multiple-color">
+                <label for="multiple-color" class="button">
+                    <span for="group">GROUP</span>
+                    <div class="color-group">
+                        <div class="color-wrapper"><input autocomplete="on" type="color" name="group" value="#1A1A1A"
+                                id="group"></div>
+                        <div class="color-wrapper"><input autocomplete="on" type="color" name="group" value="#F09D9D">
+                        </div>
+                        <div class="color-wrapper"><input autocomplete="on" type="color" name="group" value="#E6DBDB">
+                        </div>
+                    </div>
+                </label>
+
+                <input autocomplete="off" type="radio" name="mode" id="random-color">
+                <label for="random-color" class="button">
+                    RANDOM
+                    <img src="./assets/random.png" alt="">
+                </label>
+
             </div>
 
+            <div class="button-group-two">
+                <input autocomplete="off" type="radio" name="mode" id="eraser">
+                <label for="eraser" class="button">ERASER</label>
 
-            <div class="button">
-                <label for="group">GROUP</label>
-                <input type="color" name="group" id="group">
-                <input type="color" name="group">
-                <input type="color" name="group">
+                <button class="button">CLEAR</button>
+
+                <div class="grid-size-container">
+                    <div class="display">
+                        <span>GRID SIZE</span>
+                        <span class="grid-size-display">16 X 16</span>
+                    </div>
+                    <div data-value="16" data-min="2" data-max="64" class="range">
+                        <div class="range-track">
+                            <div class="range-thumb"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hover-mode-container">
+                    <label for="hover-mode">HOVER MODE</label>
+                    <div>
+                        <input autocomplete="off" type="checkbox" name="hover-mode" id="hover-mode">
+                        <label for="hover-mode" class="toggle"></label>
+                    </div>
+                </div>
             </div>
 
-
-            <div class="button">
-                RANDOM
-                <img src="./assets/random.png" alt="" width="30px">
+            <div class="group-three">
+                <div class="grid-container"></div>
+                <div class="changes">
+                    <button class="undo">
+                        <img src="./assets/undo.svg" alt="Undo">
+                    </button>
+                    <button class="redo">
+                        <img src="./assets/redo.svg" alt="Redo">
+                    </button>
+                </div>
             </div>
-
-        </div>
-        <div class="button-group-two">
-            <button>ERASER</button>
-            <button>CLEAR</button>
-            <div class="grid-size-container">
-                <label for="grid-size">GRID SIZE</label>
-                <div class="grid-size-display">16 X 16</div>
-                <input type="range" name="grid-size" id="grid-size" value="16" min="2" max="64">
-            </div>
-            <label for="hover-mode">HOVER MODE</label>
-            <input type="checkbox" name="hover-mode" id="hover-mode">
-        </div>
-        <div>
-            <div class="grid-container"></div>
-            <div class="changes">
-                <button class="undo">
-                    <img src="./assets/undo.svg" alt="Undo">
-                </button>
-                <button class="redo">
-                    <img src="./assets/redo.svg" alt="Redo">
-                </button>
-            </div>
-        </div>
-    </main>
+        </main>
+        <noscript>
+            <div>PLEASE ENABLE JAVASCRIPT</div>
+        </noscript>
+    </div>
 </body>
 
 </html>
