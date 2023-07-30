@@ -5,7 +5,7 @@
   --primary-color: #1a365d;
   --secondary-color: #ffffff;
   --button-width: 9em;
-  --heading-font-size: clamp(2.3rem, 5.8vw, 7.8rem);
+  --heading-font-size: clamp(2.2rem, 5.8vw, 7.8rem);
   --grid-size: 16;
 }
 
@@ -118,7 +118,7 @@ input[type="radio"] {
   height: var(--thumb-radius);
   display: flex;
   align-items: center;
-  margin-top: 0.2em;
+  margin-block: 0.2em;
 }
 
 .range .range-track {
@@ -291,7 +291,7 @@ noscript {
   .button-group-one {
     order: -2;
     flex-direction: row;
-    gap: 1em;
+    gap: 0.7em;
   }
 
   .grid-container {
@@ -323,4 +323,11 @@ noscript {
 
 label {
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }

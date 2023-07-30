@@ -46,45 +46,66 @@ colorInputs.forEach(colorInput => {
 const range = {
     target: document.querySelector(".range"),
     isMouseDragging: false,
-    value: 64,
+    value: 16,
     min: 2,
     max: 64,
     thumb: document.querySelector(".range-thumb"),
     track: document.querySelector(".range-track"),
-    isCalculatingValue: false,
+        
+    calculateThumbValue(event) {
+        if (event.type.startsWith("mouse") && !range.isMouseDragging) return;
 
-    getTrackThumbRatio() {
-        const thumbWidth = range.thumb.clientWidth;
-        const trackWidth = range.track.clientWidth;
-        const ratio = Math.round(trackWidth / thumbWidth * 1000) / 1000;
-        return ratio;
+        const clientX = (event.type.startsWith("mouse"))?
+            event.clientX :
+            event.touches[0].clientX;
+
+        const trackLeft = range.track.getBoundingClientRect().left;
+        const trackRight = trackLeft + range.track.clientWidth;
+        const percentageX = 
+            (Math.min(Math.max(clientX, trackLeft), trackRight) -
+            trackLeft) / range.track.clientWidth * 100;
+
+        range.target.style.setProperty("--left-offset", `${percentageX}%`);
+
+        const value = (range.max - range.min) * percentageX / 100 + range.min;
+        range.value = Math.floor(value);
     },
-        
-    adjustThumb(event) {
-        if (!range.isMouseDragging || range.isCalculatingValue) return;
-        range.isCalculatingValue = true;
-        
-
-        range.isCalculatingValue = false;
+    
+    onStartInteraction(event) {
+        event.preventDefault();
+        if (event.type.startsWith("mouse")) {
+            if (event.buttons === 1) range.isMouseDragging = true;
+            userSelect.disable();
+            document.querySelector("body").style.cursor = "pointer";
+        }
+        range.calculateThumbValue(event);
+        renderGrid(range.value);
     },
-}
 
-range.target.addEventListener("mousedown", (event) => {
-    if (event.buttons === 1) range.isMouseDragging = true;
-    userSelect.disable();
-    document.querySelector("body").style.cursor = "pointer";
-});
+    onHandleMovement(event) {
+        range.calculateThumbValue(event);
+        renderGrid(range.value);
+    },
 
-window.addEventListener("mousemove", range.adjustThumb);
+    onEndInteraction(event) {
+        if (event.button === 0 && range.isMouseDragging) {
+            range.isMouseDragging = false;
+            userSelect.enable();
+            
+            document.querySelector("body").removeAttribute("style");
+        }
+    },
+};
 
-window.addEventListener("mouseup", (event) => {
-    if (event.button === 0 && range.isMouseDragging) {
-        range.isMouseDragging = false;
-        userSelect.enable();
-        
-        document.querySelector("body").removeAttribute("style");
-    }
-});
+range.target.addEventListener("mousedown", range.onStartInteraction);
+range.target.addEventListener("touchstart", range.onStartInteraction);
+
+window.addEventListener("mousemove", range.onHandleMovement);
+range.target.addEventListener("touchmove", range.onStartInteraction);
+
+window.addEventListener("mouseup", range.onEndInteraction);
+
+
 
 //* Grid
 renderGrid(range.value);
@@ -93,7 +114,9 @@ function renderGrid(size) {
     const gridContainer = document.querySelector(".grid-container");
     document.documentElement.style.setProperty("--grid-size",`${size}`);
     const grids = grid.repeat(size*size);
-    gridContainer.innerHTML += grids;
+    const gridSize = document.querySelector(".grid-size-display");
+    gridSize.innerText = `${size} X ${size}`;
+    gridContainer.innerHTML = grids;
 }
 
 function updateWrapperBackgroundColor() {
