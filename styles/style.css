@@ -89,9 +89,18 @@ main,
   display: flex;
   flex-direction: column;
   gap: 0.5em;
-  justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+}
+
+@media (min-height: 830px) {
+  .button-group-one {
+    margin-top: auto;
+  }
+  
+  .button-group-two {
+    margin-bottom: auto;
+  }
 }
 
 input[type="radio"] {
@@ -104,10 +113,12 @@ input[type="radio"] {
 }
 
 .range {
+  --left-offset: 25.806451%;
   --thumb-radius: 0.8em;
   height: var(--thumb-radius);
   display: flex;
   align-items: center;
+  margin-top: 0.2em;
 }
 
 .range .range-track {
@@ -126,7 +137,7 @@ input[type="radio"] {
   background-color: var(--primary-color);
   position: absolute;
   top: calc(50% - var(--thumb-radius) * 0.5);
-  left: calc(25.806451% - var(--thumb-radius) * 0.5);
+  left: calc(var(--left-offset) - var(--thumb-radius) * 0.5);
   cursor: pointer;
 }
 
@@ -196,6 +207,7 @@ input[type="range"] {
   background-color: var(--secondary-color);
   display: flex;
   flex-wrap: wrap;
+  overflow-y: auto;
 }
 
 main {
@@ -224,7 +236,7 @@ noscript {
   --flex-gap: 0.3em;
   display: flex;
   align-items: center;
-  gap: var(--flex-gap);
+  gap: calc(var(--flex-gap) * 1.5);
 }
 
 .changes {
@@ -288,7 +300,7 @@ noscript {
 
   main {
     flex-wrap: nowrap;
-    margin-top: 3em;
+    margin-top: 1.5em;
   }
 
   .button-group-one .button {
@@ -307,4 +319,8 @@ noscript {
   aspect-ratio: 1 / 1;
   outline: 0.01rem solid rgb(184, 183, 182);
   width: calc(100% / var(--grid-size));
+}
+
+label {
+  cursor: pointer;
 }
