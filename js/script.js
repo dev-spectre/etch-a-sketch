@@ -95,11 +95,9 @@ const grid = (function () {
     if (gridOfLastMoves?.at(0) === grid) {
       gridOfLastMoves.push(color);
       currentUndoMoves++;
-      console.log(moves);
       return;
     }
     moves.push([grid, color]);
-    console.log(moves);
   }
 
   return {
@@ -134,7 +132,6 @@ const grid = (function () {
 
     clearMoves() {
       moves.splice(0);
-      console.log(moves);
     },
 
     clearMovesUndone() {
