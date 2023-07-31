@@ -69,7 +69,7 @@ const grid = (function () {
   });
   
   function getColor() {
-    if (currentMode === "eraser") return "#ffffff";
+    if (currentMode === "eraser") return "#fffde9";
     if (currentMode === "single-color") return colors[0];
     if (colorIndex >= colors.length) colorIndex = 0;
     const color = colors[colorIndex];
