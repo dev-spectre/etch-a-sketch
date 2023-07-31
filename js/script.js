@@ -34,7 +34,8 @@ const grid = (function () {
   const hoverMode = document.getElementById("hover-mode");
   const colors = [];
   let colorIndex = 0;
-  const moves = [];
+  const pastMoves = [];
+  const currentMove = [];
   const movesUndone = [];
   const MAX_UNDO_MOVES = 4500;
   let currentUndoMoves = 0;
@@ -45,16 +46,22 @@ const grid = (function () {
     event.preventDefault();
     const color = getColor();
     event.target.style.backgroundColor = color;
-    registerMove(event.target, color);
+    if (currentMove) registerPastMove(currentMove[0], currentMove[1]);
+    currentMove[0] = event.target;
+    currentMove[1] = color;
     isMouseDragging = true;
     dragButton = event.button;
+    console.log(currentMove, pastMoves);
   });
 
   gridContainer.addEventListener("mouseover", (event) => {
     if (!isMouseDragging && !hoverMode.checked) return;
     const color = getColor();
     event.target.style.backgroundColor = color;
-    registerMove(event.target, color);
+    if (currentMove) registerPastMove(currentMove[0], currentMove[1]);
+    currentMove[0] = event.target;
+    currentMove[1] = color;
+    console.log(currentMove, pastMoves);
   });
 
   window.addEventListener("mouseup", (event) => {
@@ -81,15 +88,15 @@ const grid = (function () {
     return `#${red}${green}${blue}`;
   }
   
-  function registerMove(grid, color) {
-    const gridOfLastMoves = moves.at(-1);
+  function registerPastMove(grid, color) {
+    const gridOfLastMoves = pastMoves.at(-1);
     if (gridOfLastMoves?.at(0) === grid &&
       gridOfLastMoves?.at(-1) === color) return;
 
     if (currentUndoMoves >= MAX_UNDO_MOVES) {
-      const gridOfFirstMoves = moves[0];
+      const gridOfFirstMoves = pastMoves[0];
       if (gridOfFirstMoves.length > 2) gridOfFirstMoves.pop();
-      if (gridOfFirstMoves.length === 2) moves.shift();
+      if (gridOfFirstMoves.length === 2) pastMoves.shift();
     }
 
     if (gridOfLastMoves?.at(0) === grid) {
@@ -97,7 +104,7 @@ const grid = (function () {
       currentUndoMoves++;
       return;
     }
-    moves.push([grid, color]);
+    pastMoves.push([grid, color]);
   }
 
   return {
@@ -131,7 +138,8 @@ const grid = (function () {
     },
 
     clearMoves() {
-      moves.splice(0);
+      pastMoves.splice(0);
+      currentMove.splice(0);
     },
 
     clearMovesUndone() {
