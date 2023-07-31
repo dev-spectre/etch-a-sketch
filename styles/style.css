@@ -21,7 +21,7 @@ body {
   font-family: "Alegreya SC", serif;
   font-size: clamp(1rem, 3vw, 2.5375rem);
   padding: 1rem;
-  min-height: 100vh;
+  min-height: 100svh;
 }
 
 h1 {
@@ -113,7 +113,7 @@ input[type="radio"] {
 }
 
 .range {
-  --left-offset: 25.806451%;
+  --left-offset: 24%;
   --thumb-radius: 0.8em;
   height: var(--thumb-radius);
   display: flex;
@@ -318,6 +318,7 @@ noscript {
 .grid {
   aspect-ratio: 1 / 1;
   outline: 0.01rem solid rgb(184, 183, 182);
+  background-color: white;
   width: calc(100% / var(--grid-size));
 }
 
