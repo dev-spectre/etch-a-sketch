@@ -29,17 +29,14 @@ const userSelect = (function () {
 const grid = (function () {
   let currentMode = "single-color";
   const gridContainer = document.querySelector(".grid-container");
+  const gridBackgroundColor = 
+    document.documentElement.style.getPropertyValue("--secondary-color");
   let isMouseDragging = false;
   let dragButton = null;
   const hoverMode = document.getElementById("hover-mode");
   const colors = [];
   let colorIndex = 0;
-  const pastMoves = [];
-  const currentMove = [];
-  const movesUndone = [];
-  const MAX_UNDO_MOVES = 4500;
-  let currentUndoMoves = 0;
-
+  
   gridContainer.addEventListener("mousedown", (event) => {
     if (isMouseDragging) return;
     //* to prevent dragging of grid
@@ -56,7 +53,7 @@ const grid = (function () {
     isMouseDragging = true;
     dragButton = event.button;
   });
-
+  
   gridContainer.addEventListener("mouseover", (event) => {
     if (!isMouseDragging && !hoverMode.checked) return;
     const color = getColor();
@@ -69,7 +66,7 @@ const grid = (function () {
     currentMove[0] = event.target;
     currentMove[1] = color;
   });
-
+  
   window.addEventListener("mouseup", (event) => {
     if (isMouseDragging && event.button === dragButton) {
       isMouseDragging = false;
@@ -82,7 +79,7 @@ const grid = (function () {
   });
   
   function getColor() {
-    if (currentMode === "eraser") return "#fffde9";
+    if (currentMode === "eraser") return gridBackgroundColor;
     if (currentMode === "single-color") return colors[0];
     if (colorIndex >= colors.length) colorIndex = 0;
     const color = colors[colorIndex];
@@ -94,28 +91,45 @@ const grid = (function () {
     return `#${red}${green}${blue}`;
   }
   
+  const indexMap = new Map();
+  const pastMoves = [];
+  const currentMove = [];
+  const movesUndone = [];
+  const MAX_UNDO_MOVES = 4500;
+  let currentUndoMoves = 0;
   function registerPastMove(grid, color) {
     const gridOfLastMoves = pastMoves.at(-1);
     if (gridOfLastMoves?.at(0) === grid &&
-      gridOfLastMoves?.at(-1) === color) return;
-
+    gridOfLastMoves?.at(-1) === color) return;
+    
     if (currentUndoMoves >= MAX_UNDO_MOVES) {
       const gridOfFirstMoves = pastMoves[0];
       if (gridOfFirstMoves.length > 2) gridOfFirstMoves.pop();
       if (gridOfFirstMoves.length === 2) pastMoves.shift();
     }
-
+    
     if (gridOfLastMoves?.at(0) === grid) {
       gridOfLastMoves.push(color);
       currentUndoMoves++;
       return;
     }
     pastMoves.push([grid, color]);
+    if (indexMap.has(grid)) {
+      const indexArr = indexMap.get(grid);
+      indexArr.push(pastMoves.length - 1);
+      indexMap.set(grid, indexArr);
+      return;
+    }
+    indexMap.set(grid, [pastMoves.length - 1]);
   }
+
 
   return {
     undo() {
-      if (!pastMoves) return;
+      if (!pastMoves) {
+        currentMove[0].style.backgroundColor = gridBackgroundColor;
+        return;
+      }
       const gridOfLastMovesUndone = movesUndone.at(-1);
       if (!gridOfLastMovesUndone) {
         movesUndone.push([currentMove[0], currentMove[1]]);
