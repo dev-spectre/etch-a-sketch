@@ -29,23 +29,24 @@ const userSelect = (function () {
 const grid = (function () {
   let currentMode = "single-color";
   const gridContainer = document.querySelector(".grid-container");
-  const gridBackgroundColor = 
+  const gridBackgroundColor =
     document.documentElement.style.getPropertyValue("--secondary-color");
   let isMouseDragging = false;
   let dragButton = null;
   const hoverMode = document.getElementById("hover-mode");
   const colors = [];
   let colorIndex = 0;
-  
+
   gridContainer.addEventListener("mousedown", (event) => {
     if (isMouseDragging) return;
     //* to prevent dragging of grid
     event.preventDefault();
     const color = getColor();
     event.target.style.backgroundColor = color;
-    if (currentMove && 
-      currentMove[0] !== event.target ||
-      currentMove [1] !== color) {
+    if (
+      (currentMove && currentMove[0] !== event.target) ||
+      currentMove[1] !== color
+    ) {
       registerPastMove(currentMove[0], currentMove[1]);
     }
     currentMove[0] = event.target;
@@ -53,20 +54,21 @@ const grid = (function () {
     isMouseDragging = true;
     dragButton = event.button;
   });
-  
+
   gridContainer.addEventListener("mouseover", (event) => {
     if (!isMouseDragging && !hoverMode.checked) return;
     const color = getColor();
     event.target.style.backgroundColor = color;
-    if (currentMove && 
-      currentMove[0] !== event.target ||
-      currentMove [1] !== color) {
+    if (
+      (currentMove && currentMove[0] !== event.target) ||
+      currentMove[1] !== color
+    ) {
       registerPastMove(currentMove[0], currentMove[1]);
     }
     currentMove[0] = event.target;
     currentMove[1] = color;
   });
-  
+
   window.addEventListener("mouseup", (event) => {
     if (isMouseDragging && event.button === dragButton) {
       isMouseDragging = false;
@@ -77,7 +79,7 @@ const grid = (function () {
     //* to prevent to opening of context menu on grid
     event.preventDefault();
   });
-  
+
   function getColor() {
     if (currentMode === "eraser") return gridBackgroundColor;
     if (currentMode === "single-color") return colors[0];
@@ -90,7 +92,7 @@ const grid = (function () {
     const blue = Math.floor(Math.random() * 256).toString(16);
     return `#${red}${green}${blue}`;
   }
-  
+
   const indexMap = new Map();
   const pastMoves = [];
   const currentMove = [];
@@ -99,17 +101,18 @@ const grid = (function () {
   let currentUndoMoves = 0;
   function registerPastMove(grid, color) {
     const gridOfLastMoves = pastMoves.at(-1);
-    if (gridOfLastMoves?.at(0) === grid &&
-    gridOfLastMoves?.at(-1) === color) return;
-    
+    if (gridOfLastMoves?.at(0) === grid && gridOfLastMoves?.at(-1) === color)
+      return;
+
     if (currentUndoMoves >= MAX_UNDO_MOVES) {
       const gridOfFirstMoves = pastMoves[0];
       if (gridOfFirstMoves.length > 2) gridOfFirstMoves.pop();
       if (gridOfFirstMoves.length === 2) pastMoves.shift();
     }
-    
+
     if (gridOfLastMoves?.at(0) === grid) {
       gridOfLastMoves.push(color);
+      console.table(pastMoves);
       currentUndoMoves++;
       return;
     }
@@ -117,27 +120,47 @@ const grid = (function () {
     if (indexMap.has(grid)) {
       const indexArr = indexMap.get(grid);
       indexArr.push(pastMoves.length - 1);
+      console.table(pastMoves);
+      console.table(indexMap);
       indexMap.set(grid, indexArr);
       return;
     }
     indexMap.set(grid, [pastMoves.length - 1]);
+    console.table(pastMoves);
+    console.table(indexMap);
   }
-
 
   return {
     undo() {
-      if (!pastMoves) {
+      if (currentMove.length === 0) return;
+      if (pastMoves.length === 0) {
         currentMove[0].style.backgroundColor = gridBackgroundColor;
         return;
       }
-      const gridOfLastMovesUndone = movesUndone.at(-1);
-      if (!gridOfLastMovesUndone) {
-        movesUndone.push([currentMove[0], currentMove[1]]);
-      } else if (gridOfLastMovesUndone.at(0) === currentMove[0] &&
-        gridOfLastMoves?.at(-1) === currentMove[1]);
 
+      const moveUndone = [currentMove[0], currentMove[1]];
+      if (pastMoves.at(-1).length === 2) {
+        const pastMove = pastMoves.pop();
+        currentMove[0] = pastMove[0];
+        currentMove[1] = pastMove[1];
+        indexMap.get(currentMove[0]).pop();
+      } else if (pastMoves.at(-1).length > 2) {
+        currentMove[0] = pastMoves.at(-1)[0];
+        currentMove[1] = pastMoves.at(-1).pop();
+      }
+
+      let prevGridLastColor;
+      if (indexMap.has(moveUndone[0])) {
+        const prevGridLastIndex = indexMap.get(moveUndone[0]).at(-1);
+        prevGridLastColor = pastMoves[prevGridLastIndex]?.at(-1);
+      }
+      prevGridLastColor = prevGridLastColor
+        ? prevGridLastColor
+        : gridBackgroundColor;
+
+      moveUndone[0].style.backgroundColor = prevGridLastColor;
       // const gridOfLastMoves = pastMoves.at(-1);
-      // const 
+      // const
     },
 
     setColors() {
@@ -256,6 +279,9 @@ range.target.addEventListener("touchmove", range.onStartInteraction);
 window.addEventListener("mouseup", range.onEndInteraction);
 
 grid.render(range.value);
+
+const undoButton = document.querySelector(".undo");
+undoButton.addEventListener("click", grid.undo);
 
 const clearButton = document.querySelector(".clear-button");
 clearButton.addEventListener("click", onClear);
