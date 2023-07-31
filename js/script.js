@@ -31,10 +31,11 @@ const grid = (function () {
   let currentMode = "single-color";
   const gridContainer = document.querySelector(".grid-container");
   let isMouseDragging = false;
+  let dragButton = null;
   const hoverMode = document.getElementById("hover-mode");
   const colors = [];
   let colorIndex = 0;
-
+  
   function getColor() {
     if (currentMode === "eraser") return "white";
     if (currentMode === "single-color") return colors[0]; 
@@ -48,6 +49,33 @@ const grid = (function () {
     return `rgb(${red}, ${green}, ${blue})`;
   }
   
+  
+    gridContainer.addEventListener("mousedown", event => {
+      if (isMouseDragging) return;
+      //* to prevent dragging of grid
+      event.preventDefault();
+      event.target.style.backgroundColor = getColor();
+      isMouseDragging = true;
+      dragButton = event.button;
+    });
+
+    gridContainer.addEventListener("mouseover", event => {
+      if (!isMouseDragging && !hoverMode.checked) return;
+      event.target.style.backgroundColor = getColor();
+    });
+
+    window.addEventListener("mouseup", (event) => {
+      if (isMouseDragging && event.button === dragButton) {
+        isMouseDragging = false;
+      }
+    });
+
+    gridContainer.addEventListener("contextmenu", event => {
+      //* to prevent to opening of context menu on grid
+      event.preventDefault();
+    });
+  
+
   return {
     setColors() {
       const colorInputs = 
@@ -72,28 +100,6 @@ const grid = (function () {
       gridContainer.innerHTML = gridsInnerHtml;
     },
     
-    addEventListeners() {
-      gridContainer.addEventListener("mousedown", event => {
-        //* to prevent dragging of grid
-        event.preventDefault();
-        event.target.style.backgroundColor = getColor();
-        isMouseDragging = true;
-      });
-
-      gridContainer.addEventListener("mouseover", event => {
-        if (!isMouseDragging && !hoverMode.checked) return;
-        event.target.style.backgroundColor = getColor();
-      });
-
-      gridContainer.addEventListener("mouseup", () => {
-        isMouseDragging = false;
-      });
-
-      gridContainer.addEventListener("contextmenu", event => {
-        //* to prevent to opening of context menu on grid
-        event.preventDefault();
-      });
-    }
   };
 })();
 
@@ -177,7 +183,6 @@ range.target.addEventListener("touchmove", range.onStartInteraction);
 window.addEventListener("mouseup", range.onEndInteraction);
 
 grid.render(range.value);
-grid.addEventListeners();
 
 const clearButton = document.querySelector(".clear-button");
 clearButton.addEventListener("click", grid.render.bind(this, range.value));
