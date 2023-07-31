@@ -34,8 +34,8 @@ const grid = (function () {
   const hoverMode = document.getElementById("hover-mode");
   const colors = [];
   let colorIndex = 0;
-  const moves = new Map();
-  const movesUndone = new Map();
+  const moves = [];
+  const movesUndone = [];
   const MAX_UNDO_MOVES = 4500;
   let currentUndoMoves = 0;
 
@@ -81,20 +81,32 @@ const grid = (function () {
     return `#${red}${green}${blue}`;
   }
   
-  function registerMove(key, color) {
-    if (currentUndoMoves >= MAX_UNDO_MOVES) return;
-    const gridMoves = moves.get(key);
-    if (!gridMoves) {
-      moves.set(key, [color]);
-      currentUndoMoves++
-      return;
-    } else if (gridMoves && gridMoves.at(-1) !== color) {
-      gridMoves.push(color);
-      currentUndoMoves++
+  function registerMove(grid, color) {
+    const gridOfLastMoves = moves.at(-1);
+    if (gridOfLastMoves?.at(0) === grid &&
+      gridOfLastMoves?.at(-1) === color) return;
+
+    if (currentUndoMoves >= MAX_UNDO_MOVES) {
+      const gridOfFirstMoves = moves[0];
+      if (gridOfFirstMoves.length > 2) gridOfFirstMoves.pop();
+      if (gridOfFirstMoves.length === 2) moves.shift();
     }
+
+    if (gridOfLastMoves?.at(0) === grid) {
+      gridOfLastMoves.push(color);
+      currentUndoMoves++;
+      console.log(moves);
+      return;
+    }
+    moves.push([grid, color]);
+    console.log(moves);
   }
 
   return {
+    undo() {
+
+    },
+
     setColors() {
       const colorInputs = document.querySelectorAll(
         `label[for="${currentMode}"] input`
@@ -121,11 +133,12 @@ const grid = (function () {
     },
 
     clearMoves() {
-      moves.clear();
+      moves.splice(0);
+      console.log(moves);
     },
 
     clearMovesUndone() {
-      movesUndone.clear();
+      movesUndone.splice(0);
     },
   };
 })();
