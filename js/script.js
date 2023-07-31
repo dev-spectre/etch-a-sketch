@@ -51,7 +51,6 @@ const grid = (function () {
     currentMove[1] = color;
     isMouseDragging = true;
     dragButton = event.button;
-    console.log(currentMove, pastMoves);
   });
 
   gridContainer.addEventListener("mouseover", (event) => {
