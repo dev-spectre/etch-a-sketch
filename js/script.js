@@ -26,7 +26,6 @@ const userSelect = (function () {
   };
 })();
 
-
 const grid = (function () {
   let currentMode = "single-color";
   const gridContainer = document.querySelector(".grid-container");
@@ -35,62 +34,83 @@ const grid = (function () {
   const hoverMode = document.getElementById("hover-mode");
   const colors = [];
   let colorIndex = 0;
+  const moves = new Map();
+  const movesUndone = new Map();
+  const MAX_UNDO_MOVES = 4500;
+  let currentUndoMoves = 0;
+
+  gridContainer.addEventListener("mousedown", (event) => {
+    if (isMouseDragging) return;
+    //* to prevent dragging of grid
+    event.preventDefault();
+    const color = getColor();
+    event.target.style.backgroundColor = color;
+    registerMove(event.target, color);
+    isMouseDragging = true;
+    dragButton = event.button;
+  });
+
+  gridContainer.addEventListener("mouseover", (event) => {
+    if (!isMouseDragging && !hoverMode.checked) return;
+    const color = getColor();
+    event.target.style.backgroundColor = color;
+    registerMove(event.target, color);
+  });
+
+  window.addEventListener("mouseup", (event) => {
+    if (isMouseDragging && event.button === dragButton) {
+      isMouseDragging = false;
+    }
+  });
+
+  gridContainer.addEventListener("contextmenu", (event) => {
+    //* to prevent to opening of context menu on grid
+    event.preventDefault();
+  });
   
   function getColor() {
-    if (currentMode === "eraser") return "white";
-    if (currentMode === "single-color") return colors[0]; 
+    if (currentMode === "eraser") return "#ffffff";
+    if (currentMode === "single-color") return colors[0];
     if (colorIndex >= colors.length) colorIndex = 0;
     const color = colors[colorIndex];
     colorIndex++;
-    if (currentMode === "multiple-color")  return color;
-    const red = Math.floor(Math.random() * 256);
-    const green = Math.floor(Math.random() * 256);
-    const blue = Math.floor(Math.random() * 256);
-    return `rgb(${red}, ${green}, ${blue})`;
+    if (currentMode === "multiple-color") return color;
+    const red = Math.floor(Math.random() * 256).toString(16);
+    const green = Math.floor(Math.random() * 256).toString(16);
+    const blue = Math.floor(Math.random() * 256).toString(16);
+    return `#${red}${green}${blue}`;
   }
   
-  
-    gridContainer.addEventListener("mousedown", event => {
-      if (isMouseDragging) return;
-      //* to prevent dragging of grid
-      event.preventDefault();
-      event.target.style.backgroundColor = getColor();
-      isMouseDragging = true;
-      dragButton = event.button;
-    });
-
-    gridContainer.addEventListener("mouseover", event => {
-      if (!isMouseDragging && !hoverMode.checked) return;
-      event.target.style.backgroundColor = getColor();
-    });
-
-    window.addEventListener("mouseup", (event) => {
-      if (isMouseDragging && event.button === dragButton) {
-        isMouseDragging = false;
-      }
-    });
-
-    gridContainer.addEventListener("contextmenu", event => {
-      //* to prevent to opening of context menu on grid
-      event.preventDefault();
-    });
-  
+  function registerMove(key, color) {
+    if (currentUndoMoves >= MAX_UNDO_MOVES) return;
+    const gridMoves = moves.get(key);
+    if (!gridMoves) {
+      moves.set(key, [color]);
+      currentUndoMoves++
+      return;
+    } else if (gridMoves && gridMoves.at(-1) !== color) {
+      gridMoves.push(color);
+      currentUndoMoves++
+    }
+  }
 
   return {
     setColors() {
-      const colorInputs = 
-        document.querySelectorAll(`label[for="${currentMode}"] input`);
+      const colorInputs = document.querySelectorAll(
+        `label[for="${currentMode}"] input`
+      );
       colors.splice(0);
-      if (colorInputs.length) colorInputs.forEach(colorInput => {
-        const color = colorInput.value;
-        colors.push(color);
-      });
+      if (colorInputs.length)
+        colorInputs.forEach((colorInput) => {
+          const color = colorInput.value;
+          colors.push(color);
+        });
     },
 
     setMode(mode) {
       currentMode = mode;
     },
-    
+
     render(size) {
       document.documentElement.style.setProperty("--grid-size", `${size}`);
       const gridHtmlElement = `<div class="grid"></div>`;
@@ -99,7 +119,14 @@ const grid = (function () {
       gridSize.innerText = `${size} X ${size}`;
       gridContainer.innerHTML = gridsInnerHtml;
     },
-    
+
+    clearMoves() {
+      moves.clear();
+    },
+
+    clearMovesUndone() {
+      movesUndone.clear();
+    },
   };
 })();
 
@@ -185,7 +212,13 @@ window.addEventListener("mouseup", range.onEndInteraction);
 grid.render(range.value);
 
 const clearButton = document.querySelector(".clear-button");
-clearButton.addEventListener("click", grid.render.bind(this, range.value));
+clearButton.addEventListener("click", onClear);
+
+function onClear() {
+  grid.render(range.value);
+  grid.clearMoves();
+  grid.clearMovesUndone();
+}
 
 function updateColor() {
   const color = this.value;
