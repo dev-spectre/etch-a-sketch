@@ -71,10 +71,16 @@ const range = {
         range.value = Math.floor(value);
     },
     
+    onMouseMovement(event) {
+        range.calculateThumbValue(event);
+        renderGrid(range.value);
+    },
+
     onStartInteraction(event) {
         event.preventDefault();
-        if (event.type.startsWith("mouse")) {
-            if (event.buttons === 1) range.isMouseDragging = true;
+        if (event.type.startsWith("mouse") && event.buttons === 1) {
+            range.isMouseDragging = true;
+            window.addEventListener("mousemove", range.onMouseMovement);
             userSelect.disable();
             document.querySelector("body").style.cursor = "pointer";
         }
@@ -82,14 +88,10 @@ const range = {
         renderGrid(range.value);
     },
 
-    onHandleMovement(event) {
-        range.calculateThumbValue(event);
-        renderGrid(range.value);
-    },
-
     onEndInteraction(event) {
         if (event.button === 0 && range.isMouseDragging) {
             range.isMouseDragging = false;
+            window.removeEventListener("mousemove", range.onMouseMovement);
             userSelect.enable();
             
             document.querySelector("body").removeAttribute("style");
@@ -98,14 +100,17 @@ const range = {
 };
 
 range.target.addEventListener("mousedown", range.onStartInteraction);
-range.target.addEventListener("touchstart", range.onStartInteraction);
 
-window.addEventListener("mousemove", range.onHandleMovement);
+range.target.addEventListener("touchstart", range.onStartInteraction);
 range.target.addEventListener("touchmove", range.onStartInteraction);
 
 window.addEventListener("mouseup", range.onEndInteraction);
 
 
+
+//* toggle switch
+const hoverMode = document.querySelector("#hover-mode");
+let eventType = (hoverMode.checked)? "mousemove": "mousedown";
 
 //* Grid
 renderGrid(range.value);
@@ -117,7 +122,9 @@ function renderGrid(size) {
     const gridSize = document.querySelector(".grid-size-display");
     gridSize.innerText = `${size} X ${size}`;
     gridContainer.innerHTML = grids;
+    console.log("render grid");
 }
+
 
 function updateWrapperBackgroundColor() {
     const color = this.value;
