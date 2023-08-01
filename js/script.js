@@ -29,8 +29,9 @@ const userSelect = (function () {
 const grid = (function () {
   let currentMode = "single-color";
   const gridContainer = document.querySelector(".grid-container");
-  const gridBackgroundColor = getComputedStyle(document.documentElement)
-    .getPropertyValue("--secondary-color");
+  const gridBackgroundColor = getComputedStyle(
+    document.documentElement
+  ).getPropertyValue("--secondary-color");
   let isMouseDragging = false;
   let dragButton = null;
   const hoverMode = document.getElementById("hover-mode");
@@ -49,6 +50,7 @@ const grid = (function () {
     ) {
       registerPastMove(currentMove[0], currentMove[1]);
     }
+    if (movesUndone.length) movesUndone.splice(0);
     currentMove[0] = event.target;
     currentMove[1] = color;
     isMouseDragging = true;
@@ -65,6 +67,7 @@ const grid = (function () {
     ) {
       registerPastMove(currentMove[0], currentMove[1]);
     }
+    if (movesUndone.length) movesUndone.splice(0);
     currentMove[0] = event.target;
     currentMove[1] = color;
   });
@@ -128,12 +131,13 @@ const grid = (function () {
   return {
     undo() {
       if (currentMove.length === 0) return;
+      const moveUndone = [currentMove[0], currentMove[1]];
       if (pastMoves.length === 0) {
         currentMove[0].style.backgroundColor = gridBackgroundColor;
+        movesUndone.push(moveUndone);
         return;
       }
 
-      const moveUndone = [currentMove[0], currentMove[1]];
       if (pastMoves.at(-1).length === 2) {
         const pastMove = pastMoves.pop();
         currentMove[0] = pastMove[0];
@@ -154,8 +158,12 @@ const grid = (function () {
         : gridBackgroundColor;
 
       moveUndone[0].style.backgroundColor = prevGridLastColor;
-      // const gridOfLastMoves = pastMoves.at(-1);
-      // const
+
+      if (movesUndone.at(-1)?.at(0) === moveUndone[0]) {
+        movesUndone.at(-1).push(moveUndone[1]);
+      } else {
+        movesUndone.push(moveUndone);
+      }
     },
 
     setColors() {
