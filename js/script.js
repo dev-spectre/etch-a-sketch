@@ -130,29 +130,51 @@ const grid = (function () {
 
   return {
     undo() {
-      if (currentMove.length === 0) return;
+      if (!currentMove.length) return;
       const moveUndone = [currentMove[0], currentMove[1]];
       if (pastMoves.length === 0) {
         currentMove[0].style.backgroundColor = gridBackgroundColor;
+        currentMove[1] = gridBackgroundColor;
+        moveUndone[1] = gridBackgroundColor;
         movesUndone.push(moveUndone);
         return;
       }
 
-      if (pastMoves.at(-1).length === 2) {
+      let prevGridLastColor;
+      if (pastMoves.at(-1)[0] !== currentMove[0]) {
         const pastMove = pastMoves.pop();
+        console.table(pastMoves);
         currentMove[0] = pastMove[0];
         currentMove[1] = pastMove[1];
-        indexMap.get(currentMove[0]).pop();
-      } else if (pastMoves.at(-1).length > 2) {
-        currentMove[0] = pastMoves.at(-1)[0];
-        currentMove[1] = pastMoves.at(-1).pop();
+        const indexArr = indexMap.get(currentMove[0]);
+        console.log(indexMap)
+        indexArr?.pop();
+        console.log(indexMap)
+        if (indexArr && !indexArr.length) indexMap.delete(currentMove[0]);
+        console.log(indexMap)
+        if (pastMoves.length && indexMap.has(moveUndone[0])) {
+          const prevGridLastIndex = indexMap.get(moveUndone[0]).at(-1);
+          prevGridLastColor = pastMoves[prevGridLastIndex]?.at(-1);
+        }
+      } else if (pastMoves.at(-1)[0] === currentMove[0]) {
+        // if (indexMap.has(moveUndone[0])) {
+        //   const prevGridLastIndex = indexMap.get(moveUndone[0]).at(-1);
+        //   prevGridLastColor = pastMoves[prevGridLastIndex]?.at(-1);
+        // }
+        if (pastMoves.at(-1).length > 2) {
+          currentMove[1] = pastMoves.at(-1).pop();
+          console.table(pastMoves);
+          prevGridLastColor = currentMove[1];
+          moveUndone[1] = currentMove[1];
+        } else {
+          currentMove[1] = pastMoves.at(-1).at(-1);
+          console.table(pastMoves);
+          prevGridLastColor = currentMove[1];
+          moveUndone[1] = currentMove[1];
+          pastMoves.pop()
+        }
       }
 
-      let prevGridLastColor;
-      if (indexMap.has(moveUndone[0])) {
-        const prevGridLastIndex = indexMap.get(moveUndone[0]).at(-1);
-        prevGridLastColor = pastMoves[prevGridLastIndex]?.at(-1);
-      }
       prevGridLastColor = prevGridLastColor
         ? prevGridLastColor
         : gridBackgroundColor;
