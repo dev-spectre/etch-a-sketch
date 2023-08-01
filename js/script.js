@@ -29,8 +29,8 @@ const userSelect = (function () {
 const grid = (function () {
   let currentMode = "single-color";
   const gridContainer = document.querySelector(".grid-container");
-  const gridBackgroundColor =
-    document.documentElement.style.getPropertyValue("--secondary-color");
+  const gridBackgroundColor = getComputedStyle(document.documentElement)
+    .getPropertyValue("--secondary-color");
   let isMouseDragging = false;
   let dragButton = null;
   const hoverMode = document.getElementById("hover-mode");
@@ -87,10 +87,10 @@ const grid = (function () {
     const color = colors[colorIndex];
     colorIndex++;
     if (currentMode === "multiple-color") return color;
-    const red = Math.floor(Math.random() * 256).toString(16);
-    const green = Math.floor(Math.random() * 256).toString(16);
-    const blue = Math.floor(Math.random() * 256).toString(16);
-    return `#${red}${green}${blue}`;
+    const red = Math.floor(Math.random() * 256);
+    const green = Math.floor(Math.random() * 256);
+    const blue = Math.floor(Math.random() * 256);
+    return `rgb(${red}, ${green}, ${blue})`;
   }
 
   const indexMap = new Map();
@@ -112,7 +112,6 @@ const grid = (function () {
 
     if (gridOfLastMoves?.at(0) === grid) {
       gridOfLastMoves.push(color);
-      console.table(pastMoves);
       currentUndoMoves++;
       return;
     }
@@ -120,14 +119,10 @@ const grid = (function () {
     if (indexMap.has(grid)) {
       const indexArr = indexMap.get(grid);
       indexArr.push(pastMoves.length - 1);
-      console.table(pastMoves);
-      console.table(indexMap);
       indexMap.set(grid, indexArr);
       return;
     }
     indexMap.set(grid, [pastMoves.length - 1]);
-    console.table(pastMoves);
-    console.table(indexMap);
   }
 
   return {
