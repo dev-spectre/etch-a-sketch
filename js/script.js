@@ -104,7 +104,7 @@ const grid = (function () {
       timeline.splice(timelineIndex + 1);
     currentMove.grid = grid;
     currentMove.color = color;
-    timeline.push(grid);
+    timeline.push({ ...currentMove });
     timelineIndex = timeline.length - 1;
     if (colorHistory.get(grid)?.at(-1) === color) return;
     if (!colorHistory.get(grid)?.push(color)) colorHistory.set(grid, [color]);
@@ -128,11 +128,22 @@ const grid = (function () {
 
       gridToUndo.style.backgroundColor = lastColorOfGrid;
 
-      if (timelineIndex >= 0) {
+      if (timelineIndex > 0) {
         timelineIndex--;
-        currentMove.grid = timeline[timelineIndex];
-        currentMove.color = currentMove.grid.style.backgroundColor;
+        currentMove.grid = timeline[timelineIndex].grid;
+        currentMove.color = timeline[timelineIndex].color;
       }
+    },
+
+    redo() {
+      if (timelineIndex === timeline.length - 1) return;
+      if (timelineIndex < timeline.length) timelineIndex++;
+      console.log(timelineIndex);
+      console.table(timeline);
+      currentMove.grid = timeline[timelineIndex].grid;
+      currentMove.color = timeline[timelineIndex].color;
+      currentMove.grid.style.backgroundColor = currentMove.color;
+      colorHistory.get(currentMove.grid).push(currentMove.color);
     },
 
     setColors() {
@@ -252,6 +263,9 @@ grid.render(range.value);
 
 const undoButton = document.querySelector(".undo");
 undoButton.addEventListener("click", grid.undo);
+
+const redoButton = document.querySelector(".redo");
+redoButton.addEventListener("click", grid.redo);
 
 const clearButton = document.querySelector(".clear-button");
 clearButton.addEventListener("click", onClear);
