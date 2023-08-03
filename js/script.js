@@ -262,9 +262,21 @@ grid.render(range.value);
 
 const undoButton = document.querySelector(".undo");
 undoButton.addEventListener("click", grid.undo);
+window.addEventListener("keydown", function (event) {
+  if (event.ctrlKey && event.key.toLowerCase() === "z" && !event.shiftKey) grid.undo();
+});
 
 const redoButton = document.querySelector(".redo");
 redoButton.addEventListener("click", grid.redo);
+window.addEventListener("keydown", function (event) {
+  console.log(event);
+  if (
+    event.ctrlKey &&
+    ((event.key.toLowerCase() === "z" && event.shiftKey) ||
+      event.key.toLowerCase() === "y")
+  )
+    grid.redo();
+});
 
 const clearButton = document.querySelector(".clear-button");
 clearButton.addEventListener("click", onClear);
