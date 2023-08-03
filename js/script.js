@@ -74,6 +74,41 @@ const grid = (function () {
     }
   });
 
+  let prevGridPosition = null;
+  gridContainer.addEventListener("touchmove", (event) => {
+    if (event.touches.length > 1 || !hoverMode.checked) return;
+    event.preventDefault();
+    const gridSize = event.target.clientWidth;
+    const gridRect = gridContainer.getBoundingClientRect();
+    const gridX = event.touches[0].pageX - gridRect.left;
+    const gridY = event.touches[0].pageY - gridRect.top;
+    const SAFE_MARGIN_PIXELS = 5;
+    if (
+      gridX < 0 ||
+      gridY < 0 ||
+      gridX >= gridRect.right - gridRect.left - SAFE_MARGIN_PIXELS ||
+      gridY >= gridRect.bottom - gridRect.top - SAFE_MARGIN_PIXELS
+    )
+      return;
+    const gridRow = Math.floor(gridY / gridSize);
+    const gridColumn = Math.floor(gridX / gridSize);
+    const gridPosition = gridRow * range.value + gridColumn + 1;
+    if (gridPosition === prevGridPosition || gridPosition > range.value ** 2)
+      return;
+    prevGridPosition = gridPosition;
+    const grid = document.querySelector(
+      `.grid-container :nth-child(${gridPosition})`
+    );
+    const color = getColor();
+    if (
+      !colorHistory.has(grid) ||
+      (colorHistory.has(grid) && colorHistory.get(grid).at(-1) !== color)
+    ) {
+      grid.style.backgroundColor = color;
+      registerMove(grid, color);
+    }
+  });
+
   gridContainer.addEventListener("contextmenu", (event) => {
     //* to prevent to opening of context menu on grid
     event.preventDefault();
@@ -263,7 +298,8 @@ grid.render(range.value);
 const undoButton = document.querySelector(".undo");
 undoButton.addEventListener("click", grid.undo);
 window.addEventListener("keydown", function (event) {
-  if (event.ctrlKey && event.key.toLowerCase() === "z" && !event.shiftKey) grid.undo();
+  if (event.ctrlKey && event.key.toLowerCase() === "z" && !event.shiftKey)
+    grid.undo();
 });
 
 const redoButton = document.querySelector(".redo");
