@@ -42,30 +42,14 @@ const grid = (function () {
     if (isMouseDragging) return;
     //* to prevent dragging of grid
     event.preventDefault();
-    const color = getColor();
-    const grid = event.target;
-    if (
-      !colorHistory.has(grid) ||
-      (colorHistory.has(grid) && colorHistory.get(grid).at(-1) !== color)
-    ) {
-      grid.style.backgroundColor = color;
-      registerMove(grid, color);
-    }
+    colorGrid(event.target);
     isMouseDragging = true;
     dragButton = event.button;
   });
 
   gridContainer.addEventListener("mouseover", (event) => {
     if (!isMouseDragging && !hoverMode.checked) return;
-    const color = getColor();
-    const grid = event.target;
-    if (
-      !colorHistory.has(grid) ||
-      (colorHistory.has(grid) && colorHistory.get(grid).at(-1) !== color)
-    ) {
-      grid.style.backgroundColor = color;
-      registerMove(grid, color);
-    }
+    colorGrid(event.target);
   });
 
   window.addEventListener("mouseup", (event) => {
@@ -74,9 +58,14 @@ const grid = (function () {
     }
   });
 
+  gridContainer.addEventListener("touchstart", (event) => {
+    colorGrid(event.target);
+  });
+
   let prevGridPosition = null;
   gridContainer.addEventListener("touchmove", (event) => {
     if (event.touches.length > 1 || !hoverMode.checked) return;
+    //* to prevent scroll
     event.preventDefault();
     const gridSize = event.target.clientWidth;
     const gridRect = gridContainer.getBoundingClientRect();
@@ -99,6 +88,15 @@ const grid = (function () {
     const grid = document.querySelector(
       `.grid-container :nth-child(${gridPosition})`
     );
+    colorGrid(grid);
+  });
+
+  gridContainer.addEventListener("contextmenu", (event) => {
+    //* to prevent to opening of context menu on grid
+    event.preventDefault();
+  });
+
+  function colorGrid(grid) {
     const color = getColor();
     if (
       !colorHistory.has(grid) ||
@@ -107,12 +105,7 @@ const grid = (function () {
       grid.style.backgroundColor = color;
       registerMove(grid, color);
     }
-  });
-
-  gridContainer.addEventListener("contextmenu", (event) => {
-    //* to prevent to opening of context menu on grid
-    event.preventDefault();
-  });
+  }
 
   function getColor() {
     if (currentMode === "eraser") return gridBackgroundColor;
@@ -305,7 +298,6 @@ window.addEventListener("keydown", function (event) {
 const redoButton = document.querySelector(".redo");
 redoButton.addEventListener("click", grid.redo);
 window.addEventListener("keydown", function (event) {
-  console.log(event);
   if (
     event.ctrlKey &&
     ((event.key.toLowerCase() === "z" && event.shiftKey) ||
