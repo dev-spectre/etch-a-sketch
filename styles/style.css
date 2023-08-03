@@ -234,14 +234,14 @@ noscript {
 }
 
 .group-three {
-  --flex-gap: 0.3em;
+  --flex-gap: 0.4em;
   display: flex;
   align-items: center;
   gap: calc(var(--flex-gap) * 1.5);
 }
 
 .changes {
-  --radius: 1em;
+  --radius: 1.5em;
   display: flex;
   flex-direction: column;
   gap: var(--flex-gap);
