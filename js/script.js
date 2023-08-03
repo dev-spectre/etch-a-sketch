@@ -58,10 +58,6 @@ const grid = (function () {
     }
   });
 
-  gridContainer.addEventListener("touchstart", (event) => {
-    colorGrid(event.target);
-  });
-
   let prevGridPosition = null;
   gridContainer.addEventListener("touchmove", (event) => {
     if (event.touches.length > 1 || !hoverMode.checked) return;
@@ -191,7 +187,7 @@ const grid = (function () {
 
     render(size) {
       document.documentElement.style.setProperty("--grid-size", `${size}`);
-      const gridHtmlElement = `<div class="grid"></div>`;
+      const gridHtmlElement = `<div class="grid"><a href="#"></a></div>`;
       const gridsInnerHtml = gridHtmlElement.repeat(size * size);
       const gridSize = document.querySelector(".grid-size-display");
       gridSize.innerText = `${size} X ${size}`;
